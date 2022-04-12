@@ -4,7 +4,7 @@ import javax.annotation.processing.ProcessingEnvironment;
 import java.util.Arrays;
 
 public class GameOfLifeCompetitive extends PApplet {
-    public static int cellSideLength=20;
+    public static int cellSideLength=10;
     public static int canvasHeight=700;
     public static int canvasWidth=1300;
     public static GameOfLifeCompetitive instance;
@@ -12,6 +12,9 @@ public class GameOfLifeCompetitive extends PApplet {
     public static GameBoard board;
     public static int[] currentColor;
     public static boolean ranOnce=false;
+    public static int drawcount=0;
+    public static int repeatPeriod=15;
+    public static boolean isRunning=false;
     public GameOfLifeCompetitive(){
         instance=this;
     }
@@ -19,13 +22,12 @@ public class GameOfLifeCompetitive extends PApplet {
         size(canvasWidth, canvasHeight);
     }
     public void mouseClicked(){
-    int[] position=new int[]{(((int)mouseX)/20)*20, (((int)mouseY)/20)*20};
+    int[] position=new int[]{(((int)mouseX)/cellSideLength)*cellSideLength, (((int)mouseY)/cellSideLength)*cellSideLength};
     board.spawnCell(position, new Cell(position, currentColor));
     }
     public void keyPressed(){
         if (key == 'b' || key == 'B') {
-            if(!ranOnce) board.timeStep();
-
+            if(!isRunning) board.timeStep();
         }
         if(key == 'c' || key == 'C'){
             if(currentColor[2]==0){
@@ -34,6 +36,18 @@ public class GameOfLifeCompetitive extends PApplet {
                 currentColor=new int[]{100, 0, 0};
             }
         }
+        if(key=='t' || key=='T'){
+            isRunning=!isRunning;
+        }
+        if(key=='a' || key=='A'){
+            repeatPeriod-=1;
+        }
+        if(key=='d' || key=='D'){
+            repeatPeriod+=1;
+        }
+
+
+
     }
     public void draw(){
 
@@ -49,17 +63,24 @@ public class GameOfLifeCompetitive extends PApplet {
                 fill(color[0], color[1] ,color[2]);
             }
 
-            rect(position[0], position[1], 20, 20);
+            rect(position[0], position[1], cellSideLength, cellSideLength);
             fill(255);
+        }
+        if(isRunning){
+          //  System.out.println(drawcount);
+            drawcount=((drawcount+1)%repeatPeriod);
+            if(drawcount==0){
+                board.timeStep();
+            }
         }
 
     }
     public static void main(String[] args){
          currentColor=new int[]{100, 0, 0};
-         allPossiblePositions=new int[(canvasHeight/20)*(canvasWidth/20)][2];
-         for (int x=0; x<canvasWidth/20; x++){
-             for(int y=0; y<canvasHeight/20; y++){
-                 allPossiblePositions[(x*(canvasHeight/20))+y]= new int[]{x*20, y*20};
+         allPossiblePositions=new int[(canvasHeight/cellSideLength)*(canvasWidth/cellSideLength)][2];
+         for (int x=0; x<canvasWidth/cellSideLength; x++){
+             for(int y=0; y<canvasHeight/cellSideLength; y++){
+                 allPossiblePositions[(x*(canvasHeight/cellSideLength))+y]= new int[]{x*cellSideLength, y*cellSideLength};
              }
          }
          board=new GameBoard();
