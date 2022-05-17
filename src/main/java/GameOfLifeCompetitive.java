@@ -5,25 +5,45 @@ import java.util.Arrays;
 
 public class GameOfLifeCompetitive extends PApplet {
     public static int cellSideLength=10;
-    public static int canvasHeight=700;
+    public static int canvasHeight=600;
+    public static int windowHeight=700;
     public static int canvasWidth=1300;
+    public static int redMaxPlaceable=30;
+    public static int blueMaxPlaceable=30;
     public static GameOfLifeCompetitive instance;
     public static int[][] allPossiblePositions;
     public static GameBoard board;
     public static int[] currentColor;
     public static boolean ranOnce=false;
     public static int drawcount=0;
+    public static boolean gameStart=true;
     public static int repeatPeriod=15;
     public static boolean isRunning=false;
     public GameOfLifeCompetitive(){
         instance=this;
     }
     public void settings(){
-        size(canvasWidth, canvasHeight);
+        size(canvasWidth, windowHeight);
     }
     public void mouseClicked(){
+        if(mouseY>canvasHeight){
+            if(currentColor[2]==0){
+                currentColor=new int[]{0, 0, 100};
+            }else{
+                currentColor=new int[]{100, 0, 0};
+            }
+            return;
+        }
     int[] position=new int[]{(((int)mouseX)/cellSideLength)*cellSideLength, (((int)mouseY)/cellSideLength)*cellSideLength};
+        if(currentColor[2]==0){
+            if(redMaxPlaceable<=0){return;}
+            redMaxPlaceable-=1;
+        }else{
+        if(blueMaxPlaceable<=0) return;
+        blueMaxPlaceable-=1;}
+
     board.spawnCell(position, new Cell(position, currentColor));
+
     }
     public void keyPressed(){
         if (key == 'b' || key == 'B') {
@@ -36,7 +56,7 @@ public class GameOfLifeCompetitive extends PApplet {
                 currentColor=new int[]{100, 0, 0};
             }
         }
-        if(key=='t' || key=='T'){
+        if((key=='t' || key=='T')&&gameStart){
             isRunning=!isRunning;
         }
         if(key=='a' || key=='A'){
@@ -52,6 +72,12 @@ public class GameOfLifeCompetitive extends PApplet {
     public void draw(){
 
         background(255);
+        fill(currentColor[0], currentColor[1], currentColor[2]);
+        rect(0, canvasHeight, canvasWidth, windowHeight-canvasHeight);
+        fill(255);
+        text("Current Speed: 1 round/"+String.valueOf(Math.max(repeatPeriod,1)/60.0)+" seconds",10, canvasHeight+10);
+        text("Change Color: C; Start: T; Increase/Decrease Speed: A/D; Trigger one Round: B;", 10, canvasHeight+20);
+        text("Red Remaining Placeable Cells: "+redMaxPlaceable+"; Blue Remaining Placeable Cells: "+blueMaxPlaceable, 10, canvasHeight+30);
         //System.out.println(board.allCells.keySet());
         for (int[] position:allPossiblePositions){
 //            if(position[0]==0&&position[1]==0){
@@ -68,7 +94,7 @@ public class GameOfLifeCompetitive extends PApplet {
         }
         if(isRunning){
           //  System.out.println(drawcount);
-            drawcount=((drawcount+1)%repeatPeriod);
+            drawcount=((drawcount+1)%Math.max(repeatPeriod, 1));
             if(drawcount==0){
                 board.timeStep();
             }

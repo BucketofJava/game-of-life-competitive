@@ -53,7 +53,8 @@ public class GameBoard {
         toKill.add(position);
         continue;
         }
-        boolean cellExists=(allCells.get(convertCoordinateForm(position))!=null);
+        Cell cell=allCells.get(convertCoordinateForm(position));
+        boolean cellExists=(cell!=null);
         if(redCellNum+blueCellNum<=1){
 
 
@@ -62,14 +63,21 @@ public class GameBoard {
         }
 
         if(redCellNum>=2&&redCellNum>blueCellNum&&cellExists){
+            if(cell.getColor()[0]==0){
+                GameOfLifeCompetitive.redMaxPlaceable+=1;
+            }
             redToSpawn.add(position);
             continue;
         }
         if(blueCellNum>=2&&blueCellNum>redCellNum&&cellExists){
+            if(cell.getColor()[2]==0){
+                GameOfLifeCompetitive.blueMaxPlaceable+=1;
+            }
             blueToSpawn.add(position);
             continue;
         }
         if(blueCellNum==3&&blueCellNum>redCellNum){
+
             blueToSpawn.add(position);
             continue;
         }
